@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+
+<!-- created by MecRoKa GBi 7.4.2022-->
+<!-- defining the H/W abstraction layer interface to be used  -->
+<!-- for simulation the 'gazebo_ros2_control/GazeboSystem' is used -->
+<!-- for real H/W the interface has to written so it fits to the real robot H/W-->
+<!-- example for real H/W: https://medium.com/@slaterobotics/how-to-implement-ros-control-on-a-custom-robot-748b52751f2e -->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">  
+  <!-- define macro to create the ros2_control tag -->
+  <xacro:macro name="create_ros2_control_tag">
+  
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <!-- the plugin(s) specifies the H/W abstraction layer to be used for ros control --> 
+      <!-- In case of simulation the Gaezbo plugin is used -->
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>                                                            
+    </hardware>
+   
+    <!-- here the joints together with their specific actuator command types and sensor state types are defined -->
+    <!-- MUST be compatible with -->
+    <!--  1. the capabilities of the H/W abstraction layer plugin loaded above -->
+    <!--  2. and the controller used and defined via the loaded 'config/controller_specific.yaml' file -->
+    
+     <joint name="steering_to_wheel_left_middle"> 
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint>  
+     <joint name="steering_to_wheel_left_front">
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint>  
+     <joint name="steering_to_wheel_left_rear">
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint>
+     <joint name="steering_to_wheel_right_middle">
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint>
+     <joint name="steering_to_wheel_right_front">
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint>
+     <joint name="steering_to_wheel_right_rear">
+       <command_interface name="velocity"/>   
+       <state_interface name="position"/>
+       <state_interface name="velocity"/>        
+     </joint> 
+     <joint name="base_to_steering_left_front">                  
+       <command_interface name="position"/>   
+       <state_interface name="position"/>      
+     </joint>  
+     <joint name="base_to_steering_left_rear">
+       <command_interface name="position"/>   
+       <state_interface name="position"/>      
+     </joint> 
+     <joint name="base_to_steering_right_front">
+       <command_interface name="position"/>   
+       <state_interface name="position"/>      
+     </joint> 
+     <joint name="base_to_steering_right_rear">
+       <command_interface name="position"/>   
+       <state_interface name="position"/>      
+     </joint>                       
+  </ros2_control>
+      
+  </xacro:macro>
+
+</robot>
