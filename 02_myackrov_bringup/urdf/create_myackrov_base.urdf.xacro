@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<!-- created by MecRoKa GBi 7.4.2021-->
+<!-- building the complete robot descrition by combining several (following) macros --> 
+<!--  1. create basic robot structure -->
+<!--  2. definition/description of the control interface for ros control -->
+<!--  3. definition/description of the ros2_control interface for gazebo via a 'your_controller_config.yaml' file -->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="myackrov">
+
+  <!-- Import myackrov_base macro -->
+  <xacro:include filename="$(find myackrov_description)/urdf/myackrov_base.urdf.xacro" />
+
+  <!-- Import ros2 HW interface control tag macro -->
+  <xacro:include filename="$(find myackrov_bringup)/ros2_control/myackrov_base.ros2_control.urdf.xacro" />  
+
+  <!-- Import setup for Gazebo macro for simulation-->
+  <xacro:include filename="$(find myackrov_bringup)/gazebo/myackrov_base.gazebo.urdf.xacro" />  
+      
+  <!-- Import color definitions  -->
+  <xacro:include filename="$(find myackrov_description)/urdf/colors.urdf.xacro" /> 
+  
+  <!-- Now lets build the robot based on the defined macros before -->
+  <xacro:create_myackrov_base />
+  <xacro:create_ros2_control_tag/>
+  <xacro:create_myackrov_gazebo_tag/>  
+
+</robot>
