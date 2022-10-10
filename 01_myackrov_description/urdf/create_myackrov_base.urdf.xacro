@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<!-- created by MecRoKa GBi 15.7.2021-->
+<!-- defining the robots basic structure -->
+<!-- just assemble the robots base and show it in rviz -->
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="myackrov">
+
+  <!-- Import myackrov_base macro -->
+  <xacro:include filename="$(find myackrov_description)/urdf/myackrov_base.urdf.xacro" />
+
+  <!-- Import color definitions  -->
+  <xacro:include filename="$(find myackrov_description)/urdf/colors.urdf.xacro" />
+  
+  <xacro:create_myackrov_base />
+
+</robot>
