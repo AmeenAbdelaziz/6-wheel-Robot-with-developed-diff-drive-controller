@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+
+<!-- created by MecRoKa GBi 15.7.2021-->
+<!-- defining the robots basic structure -->
+
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+ 
+  <!-- define macro to create the myackrov -->
+  <xacro:macro name="create_myackrov_base" >
+  
+    <!-- Setting some geometriy values -->
+    <xacro:property name="axle_width" value="0.24" />
+    <xacro:property name="axle_distance" value="0.15" />
+    <xacro:property name="wheel_diameter" value="0.12" />
+    <xacro:property name="wheel_width" value="0.06" />
+    <xacro:property name="steering_height" value="0.12" />
+    <xacro:property name="steering_diameter" value="0.03" />
+    
+
+    <!-- macro to define rough inertials -->
+    <xacro:macro name="default_inertial" params="mass">
+      <inertial>
+        <mass value="${mass}" />
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
+      </inertial>
+    </xacro:macro>
+
+    <!-- ******* start of creating all the geometrie parts and joints of the robot *******-->
+    <link name="base_footprint">
+      <visual>
+        <geometry>
+          <box size="0.01 0.01 0.01" />
+        </geometry>
+        <origin xyz="0 0 0"/>
+      </visual>
+    </link>
+  
+    <link name="base_link">    
+      <visual>
+        <geometry>
+          <box size="0.38 0.12 0.07" />
+        </geometry>
+        <origin xyz="0 0 0.025"/>
+        <material name="blue"/>
+      </visual>
+      <xacro:default_inertial mass="0.1"/>
+    </link>    
+    <joint name="footprint_to_base" type="fixed">
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+      <origin xyz="0 0 ${wheel_diameter/2}"/>
+    </joint>
+
+    <link name="device_plate">    
+      <visual>
+        <geometry>
+          <box size="0.37 0.245 0.008" />
+        </geometry>
+        <material name="red"/>
+      </visual>
+      <xacro:default_inertial mass="2"/>
+    </link>
+    <joint name="base_to_plate" type="fixed">
+      <parent link="base_link"/>
+      <child link="device_plate"/>
+      <origin xyz="0 0 0.095"/>
+    </joint>
+    
+    <link name="realsense_D415_RGB_frame">    
+      <visual>
+        <geometry>
+          <box size="0.025 0.1 0.03" />
+        </geometry>
+        <material name="orange"/>
+      </visual>
+      <xacro:default_inertial mass="2"/>
+    </link>
+    
+    <joint name="plate_to_realsense_D415" type="fixed">
+      <parent link="device_plate"/>
+      <child link="realsense_D415_RGB_frame"/>
+      <origin xyz="0.125 0.07 0.065"/>
+    </joint>
+
+    <!-- defining the macro for steering link -->
+    <xacro:macro name="mysteering" params="postfix front_factor left_factor joint_type">
+      <link name="steering_${postfix}">
+        <visual>
+          <geometry>
+            <cylinder length="${steering_height}" radius="${steering_diameter/2}" /> 
+          </geometry>
+          <material name="red"/> 
+         </visual>
+         <xacro:default_inertial mass="0.2"/>
+         <collision>
+           <geometry>
+             <cylinder length="${steering_height}" radius="${steering_diameter/2}" />
+           </geometry>
+         </collision>
+      </link>
+
+      <!-- define the joints from base to steering column -->
+      <joint name="base_to_steering_${postfix}" type="${joint_type}"> 
+        <parent link="base_link"/>
+        <child link="steering_${postfix}"/>
+        <axis xyz="0 0 1"/>
+        <origin rpy="0 0 0 " 
+                xyz="${front_factor*axle_distance}  ${left_factor*axle_width/2} 0" />
+      </joint>
+    </xacro:macro>
+    
+    <!-- defining the macro for creating a wheel -->
+    <xacro:macro name="mywheels" params="postfix front_factor left_factor">
+      <link name="wheel_${postfix}">
+        <visual>
+          <geometry>
+            <cylinder length="${wheel_width}" radius="${wheel_diameter/2}" /> 
+          </geometry>
+          <material name="green"/> 
+         </visual>
+         <xacro:default_inertial mass="0.2"/>
+         <collision>
+           <geometry>
+             <cylinder length="${wheel_width}" radius="${wheel_diameter/2}" />
+           </geometry>
+         </collision>
+      </link>
+
+      <!-- define the joints from steering to wheel -->
+      <joint name="steering_to_wheel_${postfix}" type="continuous"> 
+        <parent link="steering_${postfix}"/>
+        <child link="wheel_${postfix}"/>
+        <axis xyz="0 0 1"/>
+        <origin rpy="-1.57 -1.57 0 " 
+                xyz="0 0 ${-steering_height/2}" />
+      </joint>
+    </xacro:macro>
+    
+
+
+    <!-- calling the macro to creating the 2 fixed  steering columns -->
+    <xacro:mysteering postfix="left_middle"  left_factor="1"  front_factor="0" joint_type="fixed"/>
+    <xacro:mysteering postfix="right_middle" left_factor="-1" front_factor="0" joint_type="fixed"/>
+    
+    <!-- calling the macro to creating the 4 moveable  steering columns -->
+    <xacro:mysteering postfix="left_front"   left_factor="1"  front_factor="1"  joint_type="continuous"/>     
+    <xacro:mysteering postfix="left_rear"    left_factor="1"  front_factor="-1" joint_type="continuous"/>
+    <xacro:mysteering postfix="right_front"  left_factor="-1" front_factor="1"  joint_type="continuous"/>
+    <xacro:mysteering postfix="right_rear"   left_factor="-1" front_factor="-1" joint_type="continuous"/> 
+    
+    <!-- calling the macro to creating all 6 wheels -->
+    <xacro:mywheels postfix="left_middle"  left_factor="1"  front_factor="0" />
+    <xacro:mywheels postfix="left_front"   left_factor="1"  front_factor="1" />
+    <xacro:mywheels postfix="left_rear"    left_factor="1"  front_factor="-1" />
+    <xacro:mywheels postfix="right_middle" left_factor="-1" front_factor="0" />
+    <xacro:mywheels postfix="right_front"  left_factor="-1" front_factor="1" />
+    <xacro:mywheels postfix="right_rear"   left_factor="-1" front_factor="-1" /> 
+  </xacro:macro>
+  
+  <!-- realsense create depth frame with z axis pointing forward -->
+    <joint name="realsense_D415_RGB_to_depth_frame" type="fixed">
+      <!-- <origin xyz="0 0 0" rpy="1.57079 3.14159 1.57079"/> -->
+      <parent link="realsense_D415_RGB_frame"/>
+      <child link="realsense_D415_depth_frame" />
+    </joint>
+    <link name="realsense_D415_depth_frame"/>
+
+</robot>
