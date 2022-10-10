@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<!-- created by MecRoKa GBi 7.4.2021-->
+<!-- loading ros_control plugin to be able to use ros control in Gazebo -->
+<!-- the plugin instantiates the ros2_control controller manager automatically! -->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="create_myackrov_gazebo_tag" >
+
+    <!-- ros_control plugin enabeling contolling the robot via ros2_control in Gazebo -->
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        <parameters>$(find myackrov_bringup)/config/myackrov_base.yaml</parameters> 
+      </plugin>
+    </gazebo>
+    
+    <!-- wheel properties definition -->
+    <xacro:property name="wheel_color" value="Gazebo/Orange" />
+    <xacro:macro name="mywheelProperties" params="postfix">
+      <gazebo reference="wheel_${postfix}">
+          <mu1>1.0</mu1>
+          <mu2>1.0</mu2>
+          <kp>1000000.0</kp>
+          <kd>100.0</kd>
+          <minDepth>0.001</minDepth>
+          <maxVel>1.0</maxVel>
+          <material>${wheel_color}</material>
+      </gazebo>
+    </xacro:macro>
+    <xacro:macro name="mywheelProperties_nofriction" params="postfix">
+      <gazebo reference="wheel_${postfix}">
+          <mu1>0.01</mu1>
+          <mu2>0.01</mu2>
+          <kp>1000000.0</kp>
+          <kd>100.0</kd>
+          <minDepth>0.001</minDepth>
+          <maxVel>1.0</maxVel>
+          <material>${wheel_color}</material>
+      </gazebo>
+    </xacro:macro>
+    <xacro:mywheelProperties postfix="left_middle" />
+    <xacro:mywheelProperties_nofriction postfix="left_front"  />
+    <xacro:mywheelProperties_nofriction postfix="left_rear"   />
+    <xacro:mywheelProperties postfix="right_middle"/>
+    <xacro:mywheelProperties_nofriction postfix="right_front" />
+    <xacro:mywheelProperties_nofriction postfix="right_rear"  />    
+    
+    <!-- realsense create depth frame with z axis pointing forward for gazebo plugin-->
+    <joint name="realsense_D415_RGB_to_depth_frame_gazebo" type="fixed">
+      <origin xyz="0 0 0" rpy="1.57079 3.14159 1.57079"/>
+      <parent link="realsense_D415_RGB_frame"/>
+      <child link="realsense_D415_depth_frame_gazebo" />
+    </joint>
+    <link name="realsense_D415_depth_frame_gazebo"/>
+       
+  </xacro:macro>
+
+</robot>
